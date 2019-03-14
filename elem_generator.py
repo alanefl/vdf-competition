@@ -156,7 +156,21 @@ def gen_normalize_gt(n):
             to_go -= 1
 
 def gen_reduce_gt(n):
-    pass
+    elems = get_rand_group_elems(3 * n)
+    to_go = n
+    while to_go > 0:
+        mult = random.randint(1, int(n / 2))
+        base = random.choice(elems)
+        for _ in range(mult - 1):
+            other = random.choice(elems)
+            base = base.multiply(other, reduce=False)
+
+        before = ClassGroup(base[0], base[1], base[2])
+        after = base.reduced()
+
+        if not ClassGroup.is_reduced(before[0], before[1], before[2]) and ClassGroup.is_reduced(after[0], after[1], after[2]):
+            print_output_format([before], after, True)
+            to_go -= 1
 
 def gen_identity_gt(n):
     pass
