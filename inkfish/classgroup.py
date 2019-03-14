@@ -48,16 +48,22 @@ class ClassGroup(tuple):
             self._discriminant = b * b - 4 * a * c
         return self._discriminant
 
+    def is_reduced(a, b, c):
+        return ClassGroup.is_normal(a, b, c) and (a <= c and not (a == c and b < 0))
+
+    def is_normal(a, b, c):
+        return -a < b <= a
+
     def reduced(self):
         a, b, c = self.normalized()
-        while a > c or (a == c and b < 0):
+        while not ClassGroup.is_reduced(a, b, c):
             s = (c + b) // (c + c)
             a, b, c = c, -b + 2 * s * c, c * s * s - b * s + a
         return self.__class__(a, b, c).normalized()
 
     def normalized(self):
         a, b, c = self
-        if -a < b <= a:
+        if ClassGroup.is_normal(a, b, c):
             return self
         r = (a - b) // (2 * a)
         b, c = b + 2 * r * a, a * r * r + b * r + c
@@ -90,12 +96,17 @@ class ClassGroup(tuple):
         a, b, c = self
         return self.__class__(a, -b, c)
 
-    def multiply(self, other):
+    def multiply(self, other, reduce=True):
         """
         An implementation of form composition as documented by "Explaining composition".
         """
-        a1, b1, c1 = self.reduced()
-        a2, b2, c2 = other.reduced()
+
+        if reduce:
+            a1, b1, c1 = self.reduced()
+            a2, b2, c2 = other.reduced()
+        else:
+            a1, b1, c1 = self
+            a2, b2, c2 = other
 
         g = (b2 + b1) // 2
         h = (b2 - b1) // 2
@@ -133,7 +144,11 @@ class ClassGroup(tuple):
         a3 = s * t - r * u
         b3 = (j * u + m * r) - (k * t + l * s)
         c3 = k * l - j * m
-        return self.__class__(a3, b3, c3).reduced()
+
+        if reduce:
+            return self.__class__(a3, b3, c3).reduced()
+        else:
+            return self.__class__(a3, b3, c3)
 
     def square(self):
         """

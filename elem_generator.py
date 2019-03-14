@@ -119,12 +119,6 @@ def test_impl():
     #print(g)
     #print(g_star)
 
-#test_impl()
-#test_mul()
-#test_normalize()
-#test_reduce()
-# test_square()
-
 def print_output_format(inputs, output, truth):
     print("[%s] %s %s" % (','.join([str(inp) for inp in inputs]), str(output), "+" if truth else "-"))
 
@@ -145,7 +139,21 @@ def gen_op_gt(n):
         print_output_format([lh, rh], lh * rh, True)
 
 def gen_normalize_gt(n):
-    pass
+    elems = get_rand_group_elems(3 * n)
+    to_go = n
+    while to_go > 0:
+        mult = random.randint(1, int(n / 2))
+        base = random.choice(elems)
+        for _ in range(mult - 1):
+            other = random.choice(elems)
+            base = base.multiply(other, reduce=False)
+
+        before = ClassGroup(base[0], base[1], base[2])
+        after = base.normalized()
+
+        if not ClassGroup.is_normal(before[0], before[1], before[2]) and ClassGroup.is_normal(after[0], after[1], after[2]):
+            print_output_format([before], after, True)
+            to_go -= 1
 
 def gen_reduce_gt(n):
     pass
