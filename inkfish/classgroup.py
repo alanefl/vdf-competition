@@ -1,10 +1,13 @@
 from . import mod
 
-
 class ClassGroup(tuple):
     @classmethod
     def identity_for_discriminant(class_, d):
         return class_.from_ab_discriminant(1, 1, d)
+
+    @classmethod
+    def generator_for_discriminant(class_, d):
+        return class_.from_ab_discriminant(2, 1, d)
 
     @classmethod
     def from_ab_discriminant(class_, a, b, discriminant):
